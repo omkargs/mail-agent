@@ -1,0 +1,36 @@
+[Unit]
+Description=mail-agent — autonomous inbox agent
+After=network-online.target
+Wants=network-online.target
+# A misconfigured agent (no API key, no account) exits immediately. Without a
+# start limit systemd retries forever and the failure is easy to miss.
+# Five failures in ten minutes, then it gives up and stays down.
+StartLimitIntervalSec=600
+StartLimitBurst=5
+
+[Service]
+Type=simple
+WorkingDirectory=@REPO@
+ExecStart=@VENV@/bin/mail-agent daemon
+# on-failure, not always: the supervisor exits 0 when it is merely
+# unconfigured (missing key or account). That must stay down, not restart
+# forever. It still restarts on any real crash.
+Restart=on-failure
+RestartSec=15
+Environment=PYTHONUNBUFFERED=1
+Environment=MAIL_AGENT_CONFIG_DIR=%h/.config/mail-agent
+
+# Hardening. The agent needs its own config and data dirs, nothing else.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=%h/.config/mail-agent %h/.local/share/mail-agent
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+
+[Install]
+WantedBy=default.target

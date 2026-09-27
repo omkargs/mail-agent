@@ -1,0 +1,40 @@
+# Secrets — never commit
+.env
+*.secrets
+secrets.json
+credentials.json
+token.json
+*_token.json
+config.json
+
+# Local state
+data/
+*.db
+*.db-wal
+*.db-shm
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.ruff_cache/
+
+# Generated brain profile is editable and SHOULD be committed.
+# It contains your writing style, not credentials.
+!brain/*.md
+
+# Credentials must never enter the repo. The live secrets live in
+# ~/.config/mail-agent/ which is outside the tree, but guard against a
+# well-meaning future commit.
+google-credentials.json
+*credentials*.json
+*token*.json
+!tests/fixtures/*-credentials.json
+data/
+brain/*.md
